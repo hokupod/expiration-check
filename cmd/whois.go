@@ -22,7 +22,10 @@ var o Options
 var whoisCmd = &cobra.Command{
 	Use:   "whois",
 	Short: "Extracts expiration dates for whois",
-	Long:  `Extracts expiration dates from the results of whois queries.`,
+	Long: `Extracts expiration dates from the results of whois queries.
+
+Example for:
+  expiration-check whois [-d] example.com`,
 	Run: func(cmd *cobra.Command, args []string) {
 		expirationDate, err := whois.ExpirationDate(args[0], o.durationFlg)
 		if err != nil {
