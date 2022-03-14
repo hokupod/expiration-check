@@ -1,26 +1,44 @@
 package ssl
 
 import (
+	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"math"
-	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/itchyny/timefmt-go"
 )
 
-func query(domain string) (*http.Response, error) {
-	res, err := http.Get("https://" + domain)
-	return res, err
+func query(domain string) (*x509.Certificate, error) {
+	conf := &tls.Config{
+		InsecureSkipVerify: true,
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	d := tls.Dialer{
+		Config: conf,
+	}
+	conn, err := d.DialContext(ctx, "tcp", domain+":443")
+	cancel()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	tlsConn := conn.(*tls.Conn)
+	cert := tlsConn.ConnectionState().PeerCertificates[0]
+
+	return cert, err
 }
 
 func ExpirationDate(domain string, isDuration bool) (string, error) {
-	res, err := query(domain)
+	cert, err := query(domain)
 	if err != nil {
 		return "", err
 	}
 
-	expDate := res.TLS.PeerCertificates[0].NotAfter
+	expDate := cert.NotAfter
 	expDateStr := timefmt.Format(expDate, "%Y-%m-%d")
 
 	if isDuration {

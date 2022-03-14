@@ -15,7 +15,7 @@ import (
 
 func new() *whois.Client {
 	c := whois.NewClient()
-	c.SetTimeout(5 * time.Second)
+	c.SetTimeout(10 * time.Second)
 	return c
 }
 
