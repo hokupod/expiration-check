@@ -25,7 +25,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/hokupod/expiration-check/expiration-check/whois"
+	"github.com/hokupod/expiration-check/lib/whois"
 	"github.com/spf13/cobra"
 )
 

@@ -25,7 +25,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/hokupod/expiration-check/expiration-check/ssl"
+	"github.com/hokupod/expiration-check/lib/ssl"
 	"github.com/spf13/cobra"
 )
 
