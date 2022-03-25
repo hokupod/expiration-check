@@ -14,13 +14,13 @@ go get github.com/hokupod/expiration-check
 Check the expiration date of the SSL certificate.
 ```sh
 expiration-check ssl example.com  # output => yyyy-mm-dd
-expiration-check ssl -d example.com  # output => number
+expiration-check ssl -d example.com  # output => days
 ```
 
 Check the expiration date of the domain.
 ```sh
 expiration-check whois example.com  # output => yyyy-mm-dd
-expiration-check whois -d example.com  # output => number
+expiration-check whois -d example.com  # output => days
 ```
 
 ### Use as package
@@ -48,7 +48,7 @@ func main() {
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 	}
-	fmt.Println(expirationDate) // output => number
+	fmt.Println(expirationDate) // output => days
 
 
 	// Check the expiration date of the domain.
@@ -63,6 +63,6 @@ func main() {
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 	}
-	fmt.Println(expirationDate) // output => number
+	fmt.Println(expirationDate) // output => days
 }
 ```
