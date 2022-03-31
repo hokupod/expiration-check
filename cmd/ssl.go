@@ -25,7 +25,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/hokupod/expiration-check/lib/ssl"
+	"github.com/hokupod/expiration-check/holder"
+	"github.com/hokupod/expiration-check/holder/ssl"
 	"github.com/spf13/cobra"
 )
 
@@ -38,11 +39,22 @@ var sslCmd = &cobra.Command{
 Example for:
   expiration-check ssl [-d] example.com`,
 	Run: func(cmd *cobra.Command, args []string) {
-		expirationDate, err := ssl.ExpirationDate(args[0], o.durationFlg)
+		var sh ssl.Holder
+
+		expirationDate, err := sh.ExpirationDate(args[0])
 		if err != nil {
 			fmt.Printf("Error: %v", err)
 		}
-		fmt.Println(expirationDate)
+
+		if o.durationFlg {
+			d, err := holder.CalcDuration(expirationDate)
+			if err != nil {
+				fmt.Printf("Error: %v", err)
+			}
+			fmt.Println(d)
+		} else {
+			fmt.Println(expirationDate)
+		}
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {

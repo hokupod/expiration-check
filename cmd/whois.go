@@ -25,7 +25,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/hokupod/expiration-check/lib/whois"
+	"github.com/hokupod/expiration-check/holder"
+	"github.com/hokupod/expiration-check/holder/whois"
 	"github.com/spf13/cobra"
 )
 
@@ -44,11 +45,22 @@ var whoisCmd = &cobra.Command{
 Example for:
   expiration-check whois [-d] example.com`,
 	Run: func(cmd *cobra.Command, args []string) {
-		expirationDate, err := whois.ExpirationDate(args[0], o.durationFlg)
+		var wh whois.Holder
+
+		expirationDate, err := wh.ExpirationDate(args[0])
 		if err != nil {
 			fmt.Printf("Error: %v", err)
 		}
-		fmt.Println(expirationDate)
+
+		if o.durationFlg {
+			d, err := holder.CalcDuration(expirationDate)
+			if err != nil {
+				fmt.Printf("Error: %v", err)
+			}
+			fmt.Println(*d)
+		} else {
+			fmt.Println(expirationDate)
+		}
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
