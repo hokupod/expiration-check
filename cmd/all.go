@@ -11,9 +11,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hokupod/expiration-check/holder"
-	"github.com/hokupod/expiration-check/holder/ssl"
-	"github.com/hokupod/expiration-check/holder/whois"
+	"github.com/hokupod/expiration-check/expchk"
+	"github.com/hokupod/expiration-check/expchk/ssl"
+	"github.com/hokupod/expiration-check/expchk/whois"
 	"github.com/spf13/cobra"
 )
 
@@ -28,7 +28,7 @@ var allCmd = &cobra.Command{
 			wh whois.Holder
 		)
 
-		h := holder.ExpirationCheckerNew(args[0])
+		h := expchk.New(args[0])
 		h.AddHolder(sh)
 		h.AddHolder(wh)
 		res := h.Run()

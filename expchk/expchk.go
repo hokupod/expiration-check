@@ -1,4 +1,4 @@
-package holder
+package expchk
 
 import (
 	"math"
@@ -29,7 +29,7 @@ type Expiration struct {
 	Errors         []error    `json:"errors,omitempty"`
 }
 
-func ExpirationCheckerNew(domain string) *ExpirationChecker {
+func New(domain string) *ExpirationChecker {
 	return &ExpirationChecker{Domain: domain}
 }
 
@@ -56,7 +56,7 @@ func (ex *ExpirationChecker) Run() *Result {
 			e.Errors = append(e.Errors, err)
 		}
 
-		e.Duration, err = CalcDuration(e.ExpirationDate)
+		e.Duration, err = calcDuration(e.ExpirationDate)
 		if err != nil {
 			e.Errors = append(e.Errors, err)
 		}
@@ -65,7 +65,7 @@ func (ex *ExpirationChecker) Run() *Result {
 	return &res
 }
 
-func CalcDuration(e *time.Time) (*int, error) {
+func calcDuration(e *time.Time) (*int, error) {
 	nowDateStr := timefmt.Format(time.Now().In(time.UTC), "%Y-%m-%d")
 	nowDate, err := timefmt.ParseInLocation(nowDateStr, "%Y-%m-%d", time.UTC)
 	if err != nil {

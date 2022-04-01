@@ -26,8 +26,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hokupod/expiration-check/holder"
-	"github.com/hokupod/expiration-check/holder/whois"
+	"github.com/hokupod/expiration-check/expchk"
+	"github.com/hokupod/expiration-check/expchk/whois"
 	"github.com/spf13/cobra"
 )
 
@@ -48,7 +48,7 @@ Example for:
 	Run: func(cmd *cobra.Command, args []string) {
 		var wh whois.Holder
 
-		h := holder.ExpirationCheckerNew(args[0])
+		h := expchk.New(args[0])
 		h.AddHolder(wh)
 		res := h.Run()
 		errors := res.Expirations[0].Errors
