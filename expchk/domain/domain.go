@@ -1,4 +1,4 @@
-package whois
+package domain
 
 import (
 	"fmt"
@@ -51,7 +51,7 @@ func (holder Holder) parse(domain string, whoisRaw string) (*whoisparser.Record,
 }
 
 func (holder Holder) Name() string {
-	return "whois"
+	return "domain"
 }
 
 func (holder Holder) ExpirationDate(domain string) (*time.Time, error) {

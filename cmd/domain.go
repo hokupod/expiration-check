@@ -27,7 +27,7 @@ import (
 	"os"
 
 	"github.com/hokupod/expiration-check/expchk"
-	"github.com/hokupod/expiration-check/expchk/whois"
+	"github.com/hokupod/expiration-check/expchk/domain"
 	"github.com/spf13/cobra"
 )
 
@@ -37,20 +37,20 @@ type Options struct {
 
 var o Options
 
-// whoisCmd represents the expiration command
-var whoisCmd = &cobra.Command{
-	Use:   "whois",
-	Short: "Extracts expiration dates for whois",
+// domainCmd represents the expiration command
+var domainCmd = &cobra.Command{
+	Use:   "domain",
+	Short: "Extracts expiration dates for domain",
 	Long: `Extracts expiration dates from the results of whois queries.
 
 Example for:
-  expiration-check whois [-d] example.com`,
+  expiration-check domain [-d] example.com`,
 	Run: func(cmd *cobra.Command, args []string) {
-		var wh whois.Holder
+		var wh domain.Holder
 
-		h := expchk.New(args[0])
-		h.AddHolder(wh)
-		res := h.Run()
+		ec := expchk.New(args[0])
+		ec.AddHolder(wh)
+		res := ec.Run()
 		errors := res.Expirations[0].Errors
 		if errors != nil {
 			for _, err := range errors {
@@ -74,7 +74,7 @@ Example for:
 }
 
 func init() {
-	rootCmd.AddCommand(whoisCmd)
+	rootCmd.AddCommand(domainCmd)
 
-	whoisCmd.Flags().BoolVarP(&o.durationFlg, "duration", "d", false, "Returns the number of days until the expiration date.")
+	domainCmd.Flags().BoolVarP(&o.durationFlg, "duration", "d", false, "Returns the number of days until the expiration date.")
 }

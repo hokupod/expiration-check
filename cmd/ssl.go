@@ -42,9 +42,9 @@ Example for:
 	Run: func(cmd *cobra.Command, args []string) {
 		var sh ssl.Holder
 
-		h := expchk.New(args[0])
-		h.AddHolder(sh)
-		res := h.Run()
+		ec := expchk.New(args[0])
+		ec.AddHolder(sh)
+		res := ec.Run()
 		errors := res.Expirations[0].Errors
 		if errors != nil {
 			for _, err := range errors {

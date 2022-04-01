@@ -12,8 +12,8 @@ import (
 	"os"
 
 	"github.com/hokupod/expiration-check/expchk"
+	"github.com/hokupod/expiration-check/expchk/domain"
 	"github.com/hokupod/expiration-check/expchk/ssl"
-	"github.com/hokupod/expiration-check/expchk/whois"
 	"github.com/spf13/cobra"
 )
 
@@ -21,17 +21,20 @@ import (
 var allCmd = &cobra.Command{
 	Use:   "all",
 	Short: "Extracts expiration dates for all supported source",
-	Long:  `Extracts expiration dates for all supported source.(JSON output)`,
+	Long: `Extracts expiration dates for all supported source.(JSON output)
+
+Example for:
+  expiration-check all example.com`,
 	Run: func(cmd *cobra.Command, args []string) {
 		var (
 			sh ssl.Holder
-			wh whois.Holder
+			dh domain.Holder
 		)
 
-		h := expchk.New(args[0])
-		h.AddHolder(sh)
-		h.AddHolder(wh)
-		res := h.Run()
+		ec := expchk.New(args[0])
+		ec.AddHolder(sh)
+		ec.AddHolder(dh)
+		res := ec.Run()
 		for _, ex := range res.Expirations {
 			if ex.Errors != nil {
 				for _, err := range ex.Errors {
