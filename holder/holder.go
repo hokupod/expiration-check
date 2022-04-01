@@ -9,7 +9,7 @@ import (
 
 type IHolder interface {
 	Name() string
-	ExpirationDate(string) (*time.Time, error)
+	ExpirationDate(domain string) (*time.Time, error)
 }
 
 type ExpirationChecker struct {
@@ -26,16 +26,17 @@ type Expiration struct {
 	Name           string     `json:"name"`
 	ExpirationDate *time.Time `json:"expiration_date"`
 	Duration       *int       `json:"duration"`
-	Errors         []error    `json:"error"`
+	Errors         []error    `json:"errors"`
 }
 
-var Expirations []IHolder
-
-func (ex *ExpirationChecker) New(domain string) *ExpirationChecker {
+func ExpirationCheckerNew(domain string) *ExpirationChecker {
 	return &ExpirationChecker{Domain: domain}
 }
 
 func (ex *ExpirationChecker) AddHolder(h IHolder) {
+	if ex.Expirations == nil {
+		ex.Expirations = make(map[string]IHolder)
+	}
 	ex.Expirations[h.Name()] = h
 }
 

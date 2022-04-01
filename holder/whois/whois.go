@@ -14,20 +14,20 @@ import (
 
 type IHolder interface {
 	Name() string
-	ExpirationDate() (*time.Time, error)
+	ExpirationDate(domain string) (*time.Time, error)
 }
 
 type Holder struct {
 	expirationDate *time.Time
 }
 
-func (holder *Holder) getClient() *whois.Client {
+func (holder Holder) getClient() *whois.Client {
 	c := whois.NewClient()
 	c.SetTimeout(10 * time.Second)
 	return c
 }
 
-func (holder *Holder) query(domain string) (string, error) {
+func (holder Holder) query(domain string) (string, error) {
 	c := holder.getClient()
 	if strings.HasSuffix(domain, ".jp") {
 		domain = domain + "/e"
@@ -41,7 +41,7 @@ func (holder *Holder) query(domain string) (string, error) {
 	return response, nil
 }
 
-func (holder *Holder) parse(domain string, whoisRaw string) (*whoisparser.Record, error) {
+func (holder Holder) parse(domain string, whoisRaw string) (*whoisparser.Record, error) {
 	whoisRecord := whoisparser.Parse(domain, whoisRaw)
 	if whoisRecord.ErrCode != 0 {
 		return whoisRecord, fmt.Errorf("ParseError")
@@ -50,11 +50,11 @@ func (holder *Holder) parse(domain string, whoisRaw string) (*whoisparser.Record
 	return whoisRecord, nil
 }
 
-func (holder *Holder) Name() string {
+func (holder Holder) Name() string {
 	return "whois"
 }
 
-func (holder *Holder) ExpirationDate(domain string) (*time.Time, error) {
+func (holder Holder) ExpirationDate(domain string) (*time.Time, error) {
 	if holder.expirationDate != nil {
 		return holder.expirationDate, nil
 	}

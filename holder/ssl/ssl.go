@@ -9,14 +9,14 @@ import (
 
 type IHolder interface {
 	Name() string
-	ExpirationDate() (*time.Time, error)
+	ExpirationDate(domain string) (*time.Time, error)
 }
 
 type Holder struct {
 	expirationDate *time.Time
 }
 
-func (holder *Holder) query(domain string) (*x509.Certificate, error) {
+func (holder Holder) query(domain string) (*x509.Certificate, error) {
 	conf := &tls.Config{
 		InsecureSkipVerify: true,
 	}
@@ -37,11 +37,11 @@ func (holder *Holder) query(domain string) (*x509.Certificate, error) {
 	return cert, err
 }
 
-func (holder *Holder) Name() string {
+func (holder Holder) Name() string {
 	return "ssl"
 }
 
-func (holder *Holder) ExpirationDate(domain string) (*time.Time, error) {
+func (holder Holder) ExpirationDate(domain string) (*time.Time, error) {
 	if holder.expirationDate != nil {
 		return holder.expirationDate, nil
 	}
