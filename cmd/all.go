@@ -7,7 +7,9 @@ package cmd
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"os"
 
 	"github.com/hokupod/expiration-check/holder"
 	"github.com/hokupod/expiration-check/holder/ssl"
@@ -29,21 +31,35 @@ var allCmd = &cobra.Command{
 		h := holder.ExpirationCheckerNew(args[0])
 		h.AddHolder(sh)
 		h.AddHolder(wh)
-		res := h.RunAll()
+		res := h.Run()
+		for _, ex := range res.Expirations {
+			if ex.Errors != nil {
+				for _, err := range ex.Errors {
+					fmt.Printf("Error: %v: %v\n", ex.Name, err)
+				}
+				os.Exit(1)
+			}
+		}
 
 		jsonStr, err := json.Marshal(res)
 		if err != nil {
 			fmt.Printf("Error: %v", err)
-			return
+			os.Exit(1)
 		}
 
 		var buf bytes.Buffer
 		err = json.Indent(&buf, []byte(jsonStr), "", "  ")
 		if err != nil {
 			fmt.Printf("Error: %v", err)
-			return
+			os.Exit(1)
 		}
 		fmt.Println(buf.String())
+	},
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) < 1 {
+			return errors.New("requires domain")
+		}
+		return nil
 	},
 }
 

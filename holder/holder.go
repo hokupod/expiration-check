@@ -26,7 +26,7 @@ type Expiration struct {
 	Name           string     `json:"name"`
 	ExpirationDate *time.Time `json:"expiration_date"`
 	Duration       *int       `json:"duration"`
-	Errors         []error    `json:"errors"`
+	Errors         []error    `json:"errors,omitempty"`
 }
 
 func ExpirationCheckerNew(domain string) *ExpirationChecker {
@@ -40,7 +40,7 @@ func (ex *ExpirationChecker) AddHolder(h IHolder) {
 	ex.Expirations[h.Name()] = h
 }
 
-func (ex *ExpirationChecker) RunAll() *Result {
+func (ex *ExpirationChecker) Run() *Result {
 	var (
 		res Result
 		err error

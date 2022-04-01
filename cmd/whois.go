@@ -24,6 +24,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/hokupod/expiration-check/holder"
 	"github.com/hokupod/expiration-check/holder/whois"
@@ -47,19 +48,21 @@ Example for:
 	Run: func(cmd *cobra.Command, args []string) {
 		var wh whois.Holder
 
-		expirationDate, err := wh.ExpirationDate(args[0])
-		if err != nil {
-			fmt.Printf("Error: %v", err)
+		h := holder.ExpirationCheckerNew(args[0])
+		h.AddHolder(wh)
+		res := h.Run()
+		errors := res.Expirations[0].Errors
+		if errors != nil {
+			for _, err := range errors {
+				fmt.Printf("Error: %v: %v\n", res.Expirations[0].Name, err)
+			}
+			os.Exit(1)
 		}
 
 		if o.durationFlg {
-			d, err := holder.CalcDuration(expirationDate)
-			if err != nil {
-				fmt.Printf("Error: %v", err)
-			}
-			fmt.Println(*d)
+			fmt.Println(*res.Expirations[0].Duration)
 		} else {
-			fmt.Println(expirationDate)
+			fmt.Println(res.Expirations[0].ExpirationDate)
 		}
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
