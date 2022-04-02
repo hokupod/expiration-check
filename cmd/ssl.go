@@ -45,11 +45,9 @@ Example for:
 		ec := expchk.New(args[0])
 		ec.AddHolder(sh)
 		res := ec.Run()
-		errors := res.Expirations[0].Errors
-		if errors != nil {
-			for _, err := range errors {
-				fmt.Printf("Error: %v: %v\n", res.Expirations[0].Name, err)
-			}
+		err := res.Expirations[0].Error
+		if err != nil {
+			fmt.Printf("Error: %v: %v\n", res.Expirations[0].Name, err)
 			os.Exit(1)
 		}
 

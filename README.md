@@ -40,11 +40,9 @@ var sh ssl.Holder
 ec := expchk.New("example.com")
 ec.AddHolder(sh)
 res := ec.Run()
-errors := res.Expirations[0].Errors
-if errors != nil {
-	for _, err := range errors {
-		fmt.Printf("Error: %v: %v\n", res.Expirations[0].Name, err)
-	}
+err := res.Expirations[0].Error
+if err != nil {
+	fmt.Printf("Error: %v: %v\n", res.Expirations[0].Name, err)
 }
 
 // Output *time.Time
@@ -65,10 +63,8 @@ ec.AddHolder(sh)
 ec.AddHolder(dh)
 res := ec.Run()
 for _, ex := range res.Expirations {
-	if ex.Errors != nil {
-		for _, err := range ex.Errors {
-			fmt.Printf("Error: %v: %v\n", ex.Name, err)
-		}
+	if ex.Error != nil {
+		fmt.Printf("Error: %v: %v\n", ex.Name, ex.Error)
 	}
 }
 

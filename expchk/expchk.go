@@ -26,7 +26,7 @@ type Expiration struct {
 	Name           string     `json:"name"`
 	ExpirationDate *time.Time `json:"expiration_date"`
 	Duration       *int       `json:"duration"`
-	Errors         []error    `json:"errors,omitempty"`
+	Error          error      `json:"error,omitempty"`
 }
 
 func New(domain string) *ExpirationChecker {
@@ -53,12 +53,13 @@ func (ex *ExpirationChecker) Run() *Result {
 		e.Name = k
 		e.ExpirationDate, err = v.ExpirationDate(res.Domain)
 		if err != nil {
-			e.Errors = append(e.Errors, err)
+			e.Error = err
+			continue
 		}
 
 		e.Duration, err = calcDuration(e.ExpirationDate)
 		if err != nil {
-			e.Errors = append(e.Errors, err)
+			e.Error = err
 		}
 		res.Expirations = append(res.Expirations, e)
 	}
