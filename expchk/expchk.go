@@ -13,8 +13,8 @@ type IHolder interface {
 }
 
 type ExpirationChecker struct {
-	Domain      string
-	Expirations map[string]IHolder
+	domain  string
+	holders map[string]IHolder
 }
 
 type Result struct {
@@ -30,14 +30,14 @@ type Expiration struct {
 }
 
 func New(domain string) *ExpirationChecker {
-	return &ExpirationChecker{Domain: domain}
+	return &ExpirationChecker{domain: domain}
 }
 
 func (ex *ExpirationChecker) AddHolder(h IHolder) {
-	if ex.Expirations == nil {
-		ex.Expirations = make(map[string]IHolder)
+	if ex.holders == nil {
+		ex.holders = make(map[string]IHolder)
 	}
-	ex.Expirations[h.Name()] = h
+	ex.holders[h.Name()] = h
 }
 
 func (ex *ExpirationChecker) Run() *Result {
@@ -46,12 +46,12 @@ func (ex *ExpirationChecker) Run() *Result {
 		err error
 	)
 
-	res.Domain = ex.Domain
-	for k, v := range ex.Expirations {
+	res.Domain = ex.domain
+	for n, h := range ex.holders {
 		var e Expiration
 
-		e.Name = k
-		e.ExpirationDate, err = v.ExpirationDate(res.Domain)
+		e.Name = n
+		e.ExpirationDate, err = h.ExpirationDate(res.Domain)
 		if err != nil {
 			e.Error = err
 			continue
