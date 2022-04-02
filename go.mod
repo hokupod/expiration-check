@@ -10,4 +10,4 @@ require (
 	github.com/spf13/cobra v1.3.0
 )
 
-replace github.com/icamys/whois-parser => ../whois-parser
+replace github.com/icamys/whois-parser => github.com/hokupod/whois-parser v0.0.0-20220311094013-cfacb4ffba4d
