@@ -27,23 +27,29 @@ import (
 	"os"
 
 	"github.com/hokupod/expiration-check/expchk"
-	"github.com/hokupod/expiration-check/expchk/ssl"
+	"github.com/hokupod/expiration-check/expchk/domain"
 	"github.com/spf13/cobra"
 )
 
-// sslCmd represents the ssl command
-var sslCmd = &cobra.Command{
-	Use:   "ssl",
-	Short: "Extracts expiration dates for ssl",
-	Long: `Extracts expiration dates from the results of ssl queries.
+type Options struct {
+	durationFlg bool
+}
+
+var o Options
+
+// domainCmd represents the expiration command
+var domainCmd = &cobra.Command{
+	Use:   "domain",
+	Short: "Extracts expiration dates for domain",
+	Long: `Extracts expiration dates from the results of whois queries.
 
 Example for:
-  expiration-check ssl [-d] example.com`,
+  expiration-check domain [-d] example.com`,
 	Run: func(cmd *cobra.Command, args []string) {
-		var sh ssl.Holder
+		var wh domain.Holder
 
 		ec := expchk.New(args[0])
-		ec.AddHolder(sh)
+		ec.AddHolder(wh)
 		res := ec.Run()
 		err := res.Expirations[0].Error
 		if err != nil {
@@ -66,7 +72,7 @@ Example for:
 }
 
 func init() {
-	rootCmd.AddCommand(sslCmd)
+	rootCmd.AddCommand(domainCmd)
 
-	sslCmd.Flags().BoolVarP(&o.durationFlg, "duration", "d", false, "Returns the number of days until the expiration date.")
+	domainCmd.Flags().BoolVarP(&o.durationFlg, "duration", "d", false, "Returns the number of days until the expiration date.")
 }

@@ -22,33 +22,56 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 
-	"github.com/hokupod/expiration-check/lib/whois"
+	"github.com/hokupod/expiration-check/expchk"
+	"github.com/hokupod/expiration-check/expchk/domain"
+	"github.com/hokupod/expiration-check/expchk/ssl"
 	"github.com/spf13/cobra"
 )
 
-type Options struct {
-	durationFlg bool
-}
-
-var o Options
-
-// whoisCmd represents the expiration command
-var whoisCmd = &cobra.Command{
-	Use:   "whois",
-	Short: "Extracts expiration dates for whois",
-	Long: `Extracts expiration dates from the results of whois queries.
+// allCmd represents the all command
+var allCmd = &cobra.Command{
+	Use:   "all",
+	Short: "Extracts expiration dates for all supported source",
+	Long: `Extracts expiration dates for all supported source.(JSON output)
 
 Example for:
-  expiration-check whois [-d] example.com`,
+  expiration-check all example.com`,
 	Run: func(cmd *cobra.Command, args []string) {
-		expirationDate, err := whois.ExpirationDate(args[0], o.durationFlg)
+		var (
+			sh ssl.Holder
+			dh domain.Holder
+		)
+
+		ec := expchk.New(args[0])
+		ec.AddHolder(sh)
+		ec.AddHolder(dh)
+		res := ec.Run()
+		for _, ex := range res.Expirations {
+			if ex.Error != nil {
+				fmt.Printf("Error: %v: %v\n", ex.Name, ex.Error)
+				os.Exit(1)
+			}
+		}
+
+		jsonStr, err := json.Marshal(res)
 		if err != nil {
 			fmt.Printf("Error: %v", err)
+			os.Exit(1)
 		}
-		fmt.Println(expirationDate)
+
+		var buf bytes.Buffer
+		err = json.Indent(&buf, []byte(jsonStr), "", "  ")
+		if err != nil {
+			fmt.Printf("Error: %v", err)
+			os.Exit(1)
+		}
+		fmt.Println(buf.String())
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
@@ -59,7 +82,5 @@ Example for:
 }
 
 func init() {
-	rootCmd.AddCommand(whoisCmd)
-
-	whoisCmd.Flags().BoolVarP(&o.durationFlg, "duration", "d", false, "Returns the number of days until the expiration date.")
+	rootCmd.AddCommand(allCmd)
 }

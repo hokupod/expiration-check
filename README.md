@@ -19,50 +19,65 @@ expiration-check ssl -d example.com  # output => days
 
 Check the expiration date of the domain.
 ```sh
-expiration-check whois example.com  # output => yyyy-mm-dd
-expiration-check whois -d example.com  # output => days
+expiration-check domain example.com  # output => yyyy-mm-dd
+expiration-check domain -d example.com  # output => days
 ```
 
 ### Use as package
+Import packages
 
 ```go
-package main
+"github.com/hokupod/expiration-check/expchk"
+"github.com/hokupod/expiration-check/expchk/domain"
+"github.com/hokupod/expiration-check/expchk/ssl"
+```
 
-import (
-	"fmt"
+Check the expiration date of supported type.
+```go
+// If you want to check the domain, use domain.Holder
+var sh ssl.Holder
 
-	"github.com/hokupod/expiration-check/lib/ssl"
-	"github.com/hokupod/expiration-check/lib/whois"
+ec := expchk.New("example.com")
+ec.AddHolder(sh)
+res := ec.Run()
+err := res.Expirations[0].Error
+if err != nil {
+	fmt.Printf("Error: %v: %v\n", res.Expirations[0].Name, err)
+}
+
+// Output *time.Time
+fmt.Println(res.Expirations[0].ExpirationDate)
+// Output the number of days from today to expire in days.
+fmt.Println(*res.Expirations[0].Duration)
+```
+
+Check the expiration date of all supported types.
+```go
+var (
+	sh ssl.Holder
+	dh domain.Holder
 )
 
-func main() {
-	// Check the expiration date of the SSL certificate.
-	expirationDate, err := ssl.ExpirationDate("example.com", true)
-	if err != nil {
-		fmt.Printf("Error: %v", err)
+ec := expchk.New("example.com")
+ec.AddHolder(sh)
+ec.AddHolder(dh)
+res := ec.Run()
+for _, ex := range res.Expirations {
+	if ex.Error != nil {
+		fmt.Printf("Error: %v: %v\n", ex.Name, ex.Error)
 	}
-	fmt.Println(expirationDate) // output => yyyy-mm-dd
-
-	// Output the number of days from today to expire in days.
-	expirationDate, err = ssl.ExpirationDate("example.com", false)
-	if err != nil {
-		fmt.Printf("Error: %v", err)
-	}
-	fmt.Println(expirationDate) // output => days
-
-
-	// Check the expiration date of the domain.
-	expirationDate, err := whois.ExpirationDate("example.com", true)
-	if err != nil {
-		fmt.Printf("Error: %v", err)
-	}
-	fmt.Println(expirationDate) // output => yyyy-mm-dd
-
-	// Output the number of days from today to expire in days.
-	expirationDate, err = whois.ExpirationDate("example.com", false)
-	if err != nil {
-		fmt.Printf("Error: %v", err)
-	}
-	fmt.Println(expirationDate) // output => days
 }
+
+// Support json output.
+jsonStr, err := json.Marshal(res)
+if err != nil {
+	fmt.Printf("Error: %v", err)
+}
+
+var buf bytes.Buffer
+err = json.Indent(&buf, []byte(jsonStr), "", "  ")
+if err != nil {
+	fmt.Printf("Error: %v", err)
+}
+fmt.Println(buf.String())
 ```
