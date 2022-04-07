@@ -54,6 +54,7 @@ func (ex *ExpirationChecker) Run() *Result {
 		e.ExpirationDate, err = h.ExpirationDate(res.Domain)
 		if err != nil {
 			e.Error = err
+			res.Expirations = append(res.Expirations, e)
 			continue
 		}
 
